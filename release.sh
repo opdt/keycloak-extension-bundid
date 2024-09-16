@@ -16,7 +16,7 @@
 # limitations under the License.
 #
 
-set -e
+set -ei
 
 bump_type=$1
 
