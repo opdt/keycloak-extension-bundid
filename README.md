@@ -1,6 +1,12 @@
-# keycloak-extension-bundid-trustlevel
+[![CI](https://github.com/opdt/keycloak-extension-bundid/workflows/CI/badge.svg)](https://github.com/opdt/keycloak-extension-bundid/actions?query=workflow%3ACI)
+[![Maven Central](https://img.shields.io/maven-central/v/de.arbeitsagentur.opdt/keycloak-extension-bundid.svg)](https://search.maven.org/artifact/de.arbeitsagentur.opdt/keycloak-extension-bundid)
 
-## Mission
+# keycloak-extension-bundid
+
+⚠️ The following docs are in german due to the intended audience of mainly german authorities, who need/want to integrate BundID into their own Keycloak installation. 
+Feel free to reach out if you need to integrate BundID as a non german speaking entity and need help doing so.
+
+## Einleitung
 
 Die Nutzung von *BundID* für die Identifizierung basiert auf *SAML*. Im *SAML-Request* müssen einige Einstellungen für das benötigte Vertrausniveau, die zulesenden Elemente 
 und *DisplayInformation* abgebildet sein. Diese *Keycloak-Extension* sorgt für die Anreicherung des *SAML-Requests*.
