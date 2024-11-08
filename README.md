@@ -11,6 +11,31 @@ Feel free to reach out if you need to integrate BundID as a non german speaking 
 Die Nutzung von *BundID* für die Identifizierung basiert auf *SAML*. Im *SAML-Request* müssen einige Einstellungen für das benötigte Vertrausniveau, die zulesenden Elemente 
 und *DisplayInformation* abgebildet sein. Diese *Keycloak-Extension* sorgt für die Anreicherung des *SAML-Requests*.
 
+## Installation & Einbindung
+
+Die Extension kann von Maven Central bezogen und in das `providers`-Verzeichnis von Keycloak kopiert werden.
+Der Kernbestandteil ist eine Implementierung des `AuthenticationPreprocessor`-Interfaces, welches die Anreicherung des SAML-Requests übernimmt.
+Zur Steuerung, für welchen Identity Provider die Anbindung erfolgen soll, muss die Konfigurationsoption `KC_SPI_SAML_AUTHENTICATION_PREPROCESSOR_BUNDID_PROTOCOL_ACTIVE_FOR_IDP` gesetzt werden.
+Der Default-Wert ist `bundid`. D.h. wenn dieser Name für den BundID-Identity Provider verwendet wird, funktioniert die Anbindung ohne gesonderte Konfiguration.
+
+## Konfiguration
+
+Die Extension definiert mehrere IdentityProviderMapper:
+
+- `saml-bundid-session-attribute-idp-mapper` (für das Mapping von BundID-Attributen in die Keycloak-Session)
+- `saml-retrieval-time-session-attribute-idp-mapper` (für das Mapping des Zeitstempels der BundID-Authentifizierung in die Keycloak-Session)
+
+Außerdem wird ein ProtocolMapper definiert:
+- `oidc-bundid-sessionnote-mapper` (zum Mapping der Attribute aus der UserSession in das Token)
+
+Die Funktionsweise ist dabei, dass über den `saml-bundid-session-attribute-idp-mapper` die jeweiligen BundID-Attribute (+ das jeweilige Vertrauensniveau) in die Keycloak-Session gemappt werden.
+Zusätzlich werden dort, über die angegebene `OID`, die Attribute im SAML-Request angefordert.
+
+Über den `oidc-bundid-sessionnote-mapper` werden alle BundID-Attribute aus der Session in das Token gemappt.
+Diese werden über einen Namenspräfix `ba.bundid_prop_` ausgezeichnet und im ProtocolMapper erkannt. 
+Es ist über die Parameter der Mapper möglich, einzelne Attribute vom Automapping auszuschließen.
+
+## Funktionsweise
 ### Deklaration der angeforderten Attribute
 
     <saml2p:Extensions>
