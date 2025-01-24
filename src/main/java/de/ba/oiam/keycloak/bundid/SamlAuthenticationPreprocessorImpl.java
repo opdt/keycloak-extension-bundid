@@ -44,6 +44,7 @@ public class SamlAuthenticationPreprocessorImpl implements SamlAuthenticationPre
     private static final String ACTIVE_FOR_IDP_PROPERTY = "activeForIdp";
     private static final String ONLINE_SERVICE_ID = "onlineServiceId";
     private static final String ORGANIZATION_DISPLAY_NAME = "organizationDisplayName";
+    private static final String MINIMUM_STORK_LEVEL = "minimumStorkLevel";
 
     public static final String ID = "bundid-protocol";
     private static final Logger LOG = Logger.getLogger(SamlAuthenticationPreprocessorImpl.class);
@@ -52,6 +53,8 @@ public class SamlAuthenticationPreprocessorImpl implements SamlAuthenticationPre
     private String activeForIdp = "bundid";
     private String onlineServiceId = "";
     private String organizationDisplayName = "";
+
+    private Integer minimumStorkLevel = null;
 
     public SamlAuthenticationPreprocessorImpl() {
     }
@@ -71,6 +74,7 @@ public class SamlAuthenticationPreprocessorImpl implements SamlAuthenticationPre
         activeForIdp = config.get(ACTIVE_FOR_IDP_PROPERTY, "bundid");
         onlineServiceId = config.get(ONLINE_SERVICE_ID);
         organizationDisplayName = config.get(ORGANIZATION_DISPLAY_NAME);
+        minimumStorkLevel = config.getInt(MINIMUM_STORK_LEVEL);
     }
 
     @Override
@@ -120,9 +124,13 @@ public class SamlAuthenticationPreprocessorImpl implements SamlAuthenticationPre
         return SamlAuthenticationPreprocessor.super.beforeSendingLoginRequest(authnRequest, authSession);
     }
 
-    private static AuthnLevel getAuthnLevel(AuthenticationSessionModel authSession) {
+    private AuthnLevel getAuthnLevel(AuthenticationSessionModel authSession) {
         AcrStore acrStore = new AcrStore(null, authSession);
         int loa = acrStore.getRequestedLevelOfAuthentication(null);
+
+        if (minimumStorkLevel != null) {
+            loa = Math.max(loa, minimumStorkLevel);
+        }
 
         return AuthnLevel.fromLoA(loa);
     }

@@ -65,6 +65,9 @@ Darüber werden alle vom `saml-bundid-session-attribute-idp-mapper` in die Sessi
 Gesteuert wird dies über das angeforderte `Level of Authentication (LoA)`, wobei hier die Werte 1 bis 4 zulässig sind.
 Die Anforderung von LoA erfolgt über die Keycloak Step-Up-Authentication. Weitere Infos sind der Keycloak-Dokumentation zu entnehmen.
 
+Zusätzlich ist es möglich, konfigurativ ein absolut minimales vertrauensniveau zu setzen. D.h. selbst wenn Keycloak ein niedrigeres LoA fordert, wird dann dieses Niveau an BundID übergeben.
+Gesteuert wird dies über den Parameter `KC_SPI_SAML_AUTHENTICATION_PREPROCESSOR_BUNDID_PROTOCOL_MINIMUM_STORK_LEVEL`. 
+
 ### Übergabe weiterer Pflichtattribute
 
 	<saml2p:Extensions>
