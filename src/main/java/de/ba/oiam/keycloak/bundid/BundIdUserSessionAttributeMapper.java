@@ -33,6 +33,7 @@ import org.keycloak.models.*;
 import org.keycloak.provider.ProviderConfigProperty;
 import org.keycloak.saml.common.constants.JBossSAMLURIConstants;
 import org.keycloak.saml.common.util.StringUtil;
+import org.keycloak.sessions.AuthenticationSessionModel;
 
 import javax.xml.namespace.QName;
 import java.util.*;
@@ -62,6 +63,7 @@ public class BundIdUserSessionAttributeMapper extends AbstractIdentityProviderMa
 
     public static final String BUNDID_SESSION_ATTRIBUTE_PREFIX = "ba.bundid_prop_";
     public static final String BUNDID_SESSION_ATTRIBUTE_PREFIX_EXCLUDE_FROM_AUTOMAPPER = "ba.";
+    public static final String VERIFIED_LEVEL_SUFFIX = "-verified-level";
 
     static {
         ProviderConfigProperty property;
@@ -183,9 +185,18 @@ public class BundIdUserSessionAttributeMapper extends AbstractIdentityProviderMa
             }
 
             String prefix = mapperModel.getConfig().getOrDefault(SESSION_ATTRIBUTE_PREFIX, excludeFromAutomapper ? BUNDID_SESSION_ATTRIBUTE_PREFIX_EXCLUDE_FROM_AUTOMAPPER : BUNDID_SESSION_ATTRIBUTE_PREFIX);
-            context.getAuthenticationSession().setUserSessionNote(prefix + attribute, attributeValuesInContext.get(0));
+            updateSession(context.getAuthenticationSession(), prefix + attribute, attributeValuesInContext.get(0), false);
             findStorkValueForAttribute(attributeName, context)
-                    .ifPresent(stork -> context.getAuthenticationSession().setUserSessionNote(prefix + attribute + "-verified-level", stork));
+                    .ifPresent(stork -> updateSession(context.getAuthenticationSession(), prefix + attribute, stork, true));
+        }
+    }
+
+    // Extension point for custom behavior
+    protected void updateSession(AuthenticationSessionModel authSession, String key, String value, boolean isStorkLevel) {
+        if (isStorkLevel) {
+            authSession.setUserSessionNote(key + VERIFIED_LEVEL_SUFFIX, value);
+        } else {
+            authSession.setUserSessionNote(key, value);
         }
     }
 
