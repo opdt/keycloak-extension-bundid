@@ -155,20 +155,20 @@ public class BundIdUserSessionAttributeMapper extends AbstractIdentityProviderMa
 
     @Override
     public void preprocessFederatedIdentity(KeycloakSession session, RealmModel realm, IdentityProviderMapperModel mapperModel, BrokeredIdentityContext context) {
-        setSessionAttribute(mapperModel, context);
+        setSessionAttribute(session, mapperModel, context);
     }
 
     @Override
     public void updateBrokeredUser(KeycloakSession session, RealmModel realm, UserModel user, IdentityProviderMapperModel mapperModel, BrokeredIdentityContext context) {
-        setSessionAttribute(mapperModel, context);
+        setSessionAttribute(session, mapperModel, context);
     }
 
     @Override
     public void importNewUser(KeycloakSession session, RealmModel realm, UserModel user, IdentityProviderMapperModel mapperModel, BrokeredIdentityContext context) {
-        setSessionAttribute(mapperModel, context);
+        setSessionAttribute(session, mapperModel, context);
     }
 
-    private void setSessionAttribute(IdentityProviderMapperModel mapperModel, BrokeredIdentityContext context) {
+    private void setSessionAttribute(KeycloakSession session, IdentityProviderMapperModel mapperModel, BrokeredIdentityContext context) {
         String attribute = mapperModel.getConfig()
                 .get(SESSION_ATTRIBUTE);
         if (StringUtil.isNullOrEmpty(attribute)) {
@@ -185,14 +185,14 @@ public class BundIdUserSessionAttributeMapper extends AbstractIdentityProviderMa
             }
 
             String prefix = mapperModel.getConfig().getOrDefault(SESSION_ATTRIBUTE_PREFIX, excludeFromAutomapper ? BUNDID_SESSION_ATTRIBUTE_PREFIX_EXCLUDE_FROM_AUTOMAPPER : BUNDID_SESSION_ATTRIBUTE_PREFIX);
-            updateSession(context.getAuthenticationSession(), prefix + attribute, attributeValuesInContext.get(0), false);
+            updateSession(session, context.getAuthenticationSession(), prefix + attribute, attributeValuesInContext.get(0), false);
             findStorkValueForAttribute(attributeName, context)
-                    .ifPresent(stork -> updateSession(context.getAuthenticationSession(), prefix + attribute, stork, true));
+                    .ifPresent(stork -> updateSession(session, context.getAuthenticationSession(), prefix + attribute, stork, true));
         }
     }
 
     // Extension point for custom behavior
-    protected void updateSession(AuthenticationSessionModel authSession, String key, String value, boolean isStorkLevel) {
+    protected void updateSession(KeycloakSession session, AuthenticationSessionModel authSession, String key, String value, boolean isStorkLevel) {
         if (isStorkLevel) {
             authSession.setUserSessionNote(key + VERIFIED_LEVEL_SUFFIX, value);
         } else {
