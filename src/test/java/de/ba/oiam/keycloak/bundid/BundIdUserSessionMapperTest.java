@@ -16,10 +16,17 @@
 
 package de.ba.oiam.keycloak.bundid;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
 import de.ba.oiam.keycloak.bundid.extension.model.AuthenticationRequest;
 import jakarta.xml.bind.JAXBContext;
 import jakarta.xml.bind.JAXBException;
 import jakarta.xml.bind.Unmarshaller;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
+import javax.xml.datatype.DatatypeConfigurationException;
+import javax.xml.datatype.DatatypeFactory;
 import org.junit.jupiter.api.Test;
 import org.keycloak.broker.provider.BrokeredIdentityContext;
 import org.keycloak.broker.saml.SAMLEndpoint;
@@ -35,18 +42,11 @@ import org.keycloak.sessions.AuthenticationSessionModel;
 import org.keycloak.sessions.RootAuthenticationSessionModel;
 import org.w3c.dom.Node;
 
-import javax.xml.datatype.DatatypeConfigurationException;
-import javax.xml.datatype.DatatypeFactory;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
-
 public class BundIdUserSessionMapperTest {
     @Test
     void addsStorkAttribute() throws DatatypeConfigurationException {
-        AssertionType samlAssertion = new AssertionType("response", DatatypeFactory.newInstance().newXMLGregorianCalendar());
+        AssertionType samlAssertion =
+                new AssertionType("response", DatatypeFactory.newInstance().newXMLGregorianCalendar());
         AttributeStatementType attributeStatement = new AttributeStatementType();
         AttributeType attribute = new AttributeType("attrName");
         attribute.getOtherAttributes().put(BundIdUserSessionAttributeMapper.TRUST_LEVEL_QNAME, "SUBSTANTIELL");
@@ -66,13 +66,23 @@ public class BundIdUserSessionMapperTest {
         BundIdUserSessionAttributeMapper mapper = new BundIdUserSessionAttributeMapper();
         mapper.importNewUser(null, null, null, mapperModel, context);
 
-        assertEquals("testValue", authenticationSession.getUserSessionNotes().get(BundIdUserSessionAttributeMapper.BUNDID_SESSION_ATTRIBUTE_PREFIX + "targetAttribute"));
-        assertEquals(AuthnLevel.STORK3.getFullname(), authenticationSession.getUserSessionNotes().get(BundIdUserSessionAttributeMapper.BUNDID_SESSION_ATTRIBUTE_PREFIX + "targetAttribute-verified-level"));
+        assertEquals(
+                "testValue",
+                authenticationSession
+                        .getUserSessionNotes()
+                        .get(BundIdUserSessionAttributeMapper.BUNDID_SESSION_ATTRIBUTE_PREFIX + "targetAttribute"));
+        assertEquals(
+                AuthnLevel.STORK3.getFullname(),
+                authenticationSession
+                        .getUserSessionNotes()
+                        .get(BundIdUserSessionAttributeMapper.BUNDID_SESSION_ATTRIBUTE_PREFIX
+                                + "targetAttribute-verified-level"));
     }
 
     @Test
     void customPrefix() throws DatatypeConfigurationException {
-        AssertionType samlAssertion = new AssertionType("response", DatatypeFactory.newInstance().newXMLGregorianCalendar());
+        AssertionType samlAssertion =
+                new AssertionType("response", DatatypeFactory.newInstance().newXMLGregorianCalendar());
         AttributeStatementType attributeStatement = new AttributeStatementType();
         AttributeType attribute = new AttributeType("attrName");
         attribute.getOtherAttributes().put(BundIdUserSessionAttributeMapper.TRUST_LEVEL_QNAME, "SUBSTANTIELL");
@@ -94,12 +104,15 @@ public class BundIdUserSessionMapperTest {
         mapper.importNewUser(null, null, null, mapperModel, context);
 
         assertEquals("testValue", authenticationSession.getUserSessionNotes().get("ba.targetAttribute"));
-        assertEquals(AuthnLevel.STORK3.getFullname(), authenticationSession.getUserSessionNotes().get("ba.targetAttribute-verified-level"));
+        assertEquals(
+                AuthnLevel.STORK3.getFullname(),
+                authenticationSession.getUserSessionNotes().get("ba.targetAttribute-verified-level"));
     }
 
     @Test
     void addsAttributeRequest() throws DatatypeConfigurationException, JAXBException {
-        AssertionType samlAssertion = new AssertionType("response", DatatypeFactory.newInstance().newXMLGregorianCalendar());
+        AssertionType samlAssertion =
+                new AssertionType("response", DatatypeFactory.newInstance().newXMLGregorianCalendar());
         AttributeStatementType attributeStatement = new AttributeStatementType();
         AttributeType attribute = new AttributeType("attrName");
         attribute.getOtherAttributes().put(BundIdUserSessionAttributeMapper.TRUST_LEVEL_QNAME, "SUBSTANTIELL");
@@ -119,21 +132,30 @@ public class BundIdUserSessionMapperTest {
         mapperModel.getConfig().put(BundIdUserSessionAttributeMapper.ATTRIBUTE_REQUIRED, "true");
 
         BundIdUserSessionAttributeMapper mapper = new BundIdUserSessionAttributeMapper();
-        AuthnRequestType request = new AuthnRequestType("request", DatatypeFactory.newInstance().newXMLGregorianCalendar());
+        AuthnRequestType request =
+                new AuthnRequestType("request", DatatypeFactory.newInstance().newXMLGregorianCalendar());
         mapper.updateRequest(mapperModel, request);
 
         assertEquals(1, request.getExtensions().getAny().size());
 
         JAXBContext jaxbContext = JAXBContext.newInstance(AuthenticationRequest.class);
         Unmarshaller unmarshaller = jaxbContext.createUnmarshaller();
-        AuthenticationRequest authenticationRequest = (AuthenticationRequest) unmarshaller.unmarshal((Node) request.getExtensions().getAny().get(0));
+        AuthenticationRequest authenticationRequest = (AuthenticationRequest)
+                unmarshaller.unmarshal((Node) request.getExtensions().getAny().get(0));
 
-        assertEquals("attrOid", authenticationRequest.getRequestedAttributes().getRequestedAttributes().get(0).getName());
+        assertEquals(
+                "attrOid",
+                authenticationRequest
+                        .getRequestedAttributes()
+                        .getRequestedAttributes()
+                        .get(0)
+                        .getName());
     }
 
     @Test
     void multipleAttributeRequests() throws DatatypeConfigurationException, JAXBException {
-        AssertionType samlAssertion = new AssertionType("response", DatatypeFactory.newInstance().newXMLGregorianCalendar());
+        AssertionType samlAssertion =
+                new AssertionType("response", DatatypeFactory.newInstance().newXMLGregorianCalendar());
         AttributeStatementType attributeStatement = new AttributeStatementType();
         AttributeType attribute1 = new AttributeType("attrName");
         attribute1.getOtherAttributes().put(BundIdUserSessionAttributeMapper.TRUST_LEVEL_QNAME, "SUBSTANTIELL");
@@ -156,7 +178,8 @@ public class BundIdUserSessionMapperTest {
         mapperModel.getConfig().put(BundIdUserSessionAttributeMapper.ATTRIBUTE_REQUIRED, "true");
 
         BundIdUserSessionAttributeMapper mapper = new BundIdUserSessionAttributeMapper();
-        AuthnRequestType request = new AuthnRequestType("request", DatatypeFactory.newInstance().newXMLGregorianCalendar());
+        AuthnRequestType request =
+                new AuthnRequestType("request", DatatypeFactory.newInstance().newXMLGregorianCalendar());
         mapper.updateRequest(mapperModel, request);
         mapperModel.getConfig().put(BundIdUserSessionAttributeMapper.ATTRIBUTE_NAME, "attrName2");
         mapper.updateRequest(mapperModel, request);
@@ -165,9 +188,15 @@ public class BundIdUserSessionMapperTest {
 
         JAXBContext jaxbContext = JAXBContext.newInstance(AuthenticationRequest.class);
         Unmarshaller unmarshaller = jaxbContext.createUnmarshaller();
-        AuthenticationRequest authenticationRequest = (AuthenticationRequest) unmarshaller.unmarshal((Node) request.getExtensions().getAny().get(0));
+        AuthenticationRequest authenticationRequest = (AuthenticationRequest)
+                unmarshaller.unmarshal((Node) request.getExtensions().getAny().get(0));
 
-        assertEquals(2, authenticationRequest.getRequestedAttributes().getRequestedAttributes().size());
+        assertEquals(
+                2,
+                authenticationRequest
+                        .getRequestedAttributes()
+                        .getRequestedAttributes()
+                        .size());
     }
 
     private static class TestAuthenticationSessionModel implements AuthenticationSessionModel {
@@ -199,14 +228,10 @@ public class BundIdUserSessionMapperTest {
         }
 
         @Override
-        public void setExecutionStatus(String authenticator, ExecutionStatus status) {
-
-        }
+        public void setExecutionStatus(String authenticator, ExecutionStatus status) {}
 
         @Override
-        public void clearExecutionStatus() {
-
-        }
+        public void clearExecutionStatus() {}
 
         @Override
         public UserModel getAuthenticatedUser() {
@@ -214,9 +239,7 @@ public class BundIdUserSessionMapperTest {
         }
 
         @Override
-        public void setAuthenticatedUser(UserModel user) {
-
-        }
+        public void setAuthenticatedUser(UserModel user) {}
 
         @Override
         public Set<String> getRequiredActions() {
@@ -224,29 +247,19 @@ public class BundIdUserSessionMapperTest {
         }
 
         @Override
-        public void addRequiredAction(String action) {
-
-        }
+        public void addRequiredAction(String action) {}
 
         @Override
-        public void removeRequiredAction(String action) {
-
-        }
+        public void removeRequiredAction(String action) {}
 
         @Override
-        public void addRequiredAction(UserModel.RequiredAction action) {
-
-        }
+        public void addRequiredAction(UserModel.RequiredAction action) {}
 
         @Override
-        public void removeRequiredAction(UserModel.RequiredAction action) {
-
-        }
+        public void removeRequiredAction(UserModel.RequiredAction action) {}
 
         @Override
-        public void clearUserSessionNotes() {
-
-        }
+        public void clearUserSessionNotes() {}
 
         @Override
         public String getAuthNote(String name) {
@@ -254,19 +267,13 @@ public class BundIdUserSessionMapperTest {
         }
 
         @Override
-        public void setAuthNote(String name, String value) {
-
-        }
+        public void setAuthNote(String name, String value) {}
 
         @Override
-        public void removeAuthNote(String name) {
-
-        }
+        public void removeAuthNote(String name) {}
 
         @Override
-        public void clearAuthNotes() {
-
-        }
+        public void clearAuthNotes() {}
 
         @Override
         public String getClientNote(String name) {
@@ -274,14 +281,10 @@ public class BundIdUserSessionMapperTest {
         }
 
         @Override
-        public void setClientNote(String name, String value) {
-
-        }
+        public void setClientNote(String name, String value) {}
 
         @Override
-        public void removeClientNote(String name) {
-
-        }
+        public void removeClientNote(String name) {}
 
         @Override
         public Map<String, String> getClientNotes() {
@@ -289,9 +292,7 @@ public class BundIdUserSessionMapperTest {
         }
 
         @Override
-        public void clearClientNotes() {
-
-        }
+        public void clearClientNotes() {}
 
         @Override
         public Set<String> getClientScopes() {
@@ -299,9 +300,7 @@ public class BundIdUserSessionMapperTest {
         }
 
         @Override
-        public void setClientScopes(Set<String> clientScopes) {
-
-        }
+        public void setClientScopes(Set<String> clientScopes) {}
 
         @Override
         public String getRedirectUri() {
@@ -309,9 +308,7 @@ public class BundIdUserSessionMapperTest {
         }
 
         @Override
-        public void setRedirectUri(String uri) {
-
-        }
+        public void setRedirectUri(String uri) {}
 
         @Override
         public RealmModel getRealm() {
@@ -329,9 +326,7 @@ public class BundIdUserSessionMapperTest {
         }
 
         @Override
-        public void setAction(String action) {
-
-        }
+        public void setAction(String action) {}
 
         @Override
         public String getProtocol() {
@@ -339,8 +334,6 @@ public class BundIdUserSessionMapperTest {
         }
 
         @Override
-        public void setProtocol(String method) {
-
-        }
+        public void setProtocol(String method) {}
     }
 }

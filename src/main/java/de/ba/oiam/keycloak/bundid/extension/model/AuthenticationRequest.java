@@ -16,21 +16,19 @@
 
 package de.ba.oiam.keycloak.bundid.extension.model;
 
-
 import jakarta.xml.bind.JAXBContext;
 import jakarta.xml.bind.JAXBException;
 import jakarta.xml.bind.Marshaller;
 import jakarta.xml.bind.Unmarshaller;
 import jakarta.xml.bind.annotation.*;
+import java.util.ArrayList;
+import java.util.List;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
 import org.keycloak.dom.saml.v2.protocol.AuthnRequestType;
 import org.keycloak.dom.saml.v2.protocol.ExtensionsType;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
-
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import java.util.ArrayList;
-import java.util.List;
 
 @XmlRootElement(name = "AuthenticationRequest", namespace = "https://www.akdb.de/request/2018/09")
 @XmlAccessorType(XmlAccessType.FIELD)
@@ -112,7 +110,8 @@ public class AuthenticationRequest {
             Document document = documentBuilder.newDocument();
             marshaller.marshal(this, document);
 
-            List<Object> allExtensions = new ArrayList<>(authnRequest.getExtensions().getAny());
+            List<Object> allExtensions =
+                    new ArrayList<>(authnRequest.getExtensions().getAny());
             allExtensions.forEach(ext -> authnRequest.getExtensions().removeExtension(ext));
             authnRequest.getExtensions().addExtension(document.getDocumentElement());
         } catch (Exception e) {

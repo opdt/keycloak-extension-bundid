@@ -17,7 +17,7 @@
 package de.ba.oiam.keycloak.bundid;
 
 import com.google.auto.service.AutoService;
-import org.jboss.logging.Logger;
+import java.util.*;
 import org.keycloak.broker.provider.AbstractIdentityProviderMapper;
 import org.keycloak.broker.provider.BrokeredIdentityContext;
 import org.keycloak.broker.provider.IdentityProviderMapper;
@@ -27,8 +27,6 @@ import org.keycloak.models.*;
 import org.keycloak.provider.ProviderConfigProperty;
 import org.keycloak.saml.common.util.StringUtil;
 
-import java.util.*;
-
 @AutoService(IdentityProviderMapper.class)
 public class RetrievalTimestampAttributeMapper extends AbstractIdentityProviderMapper {
 
@@ -36,7 +34,8 @@ public class RetrievalTimestampAttributeMapper extends AbstractIdentityProviderM
 
     private static final List<ProviderConfigProperty> configProperties = new ArrayList<>();
     public static final String SESSION_ATTRIBUTE = "session.attribute";
-    private static final Set<IdentityProviderSyncMode> IDENTITY_PROVIDER_SYNC_MODES = new HashSet<>(Arrays.asList(IdentityProviderSyncMode.values()));
+    private static final Set<IdentityProviderSyncMode> IDENTITY_PROVIDER_SYNC_MODES =
+            new HashSet<>(Arrays.asList(IdentityProviderSyncMode.values()));
 
     static {
         ProviderConfigProperty property;
@@ -81,17 +80,31 @@ public class RetrievalTimestampAttributeMapper extends AbstractIdentityProviderM
     }
 
     @Override
-    public void preprocessFederatedIdentity(KeycloakSession session, RealmModel realm, IdentityProviderMapperModel mapperModel, BrokeredIdentityContext context) {
+    public void preprocessFederatedIdentity(
+            KeycloakSession session,
+            RealmModel realm,
+            IdentityProviderMapperModel mapperModel,
+            BrokeredIdentityContext context) {
         setSessionAttribute(mapperModel, context);
     }
 
     @Override
-    public void updateBrokeredUser(KeycloakSession session, RealmModel realm, UserModel user, IdentityProviderMapperModel mapperModel, BrokeredIdentityContext context) {
+    public void updateBrokeredUser(
+            KeycloakSession session,
+            RealmModel realm,
+            UserModel user,
+            IdentityProviderMapperModel mapperModel,
+            BrokeredIdentityContext context) {
         setSessionAttribute(mapperModel, context);
     }
 
     @Override
-    public void importNewUser(KeycloakSession session, RealmModel realm, UserModel user, IdentityProviderMapperModel mapperModel, BrokeredIdentityContext context) {
+    public void importNewUser(
+            KeycloakSession session,
+            RealmModel realm,
+            UserModel user,
+            IdentityProviderMapperModel mapperModel,
+            BrokeredIdentityContext context) {
         setSessionAttribute(mapperModel, context);
     }
 
@@ -103,7 +116,6 @@ public class RetrievalTimestampAttributeMapper extends AbstractIdentityProviderM
 
         context.getAuthenticationSession().setUserSessionNote(attribute, String.valueOf(Time.currentTime()));
     }
-
 
     @Override
     public String getHelpText() {

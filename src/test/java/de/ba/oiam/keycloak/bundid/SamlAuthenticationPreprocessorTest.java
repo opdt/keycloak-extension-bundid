@@ -16,6 +16,12 @@
 
 package de.ba.oiam.keycloak.bundid;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.mockito.Mockito.when;
+
+import java.net.URI;
+import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.keycloak.dom.saml.v2.protocol.AuthnContextComparisonType;
 import org.keycloak.dom.saml.v2.protocol.AuthnRequestType;
@@ -23,14 +29,6 @@ import org.keycloak.models.Constants;
 import org.keycloak.sessions.AuthenticationSessionModel;
 import org.mockito.Answers;
 import org.mockito.Mockito;
-
-import java.net.URI;
-import java.util.List;
-import java.util.Map;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.mockito.Mockito.when;
 
 class SamlAuthenticationPreprocessorTest {
 
@@ -40,13 +38,19 @@ class SamlAuthenticationPreprocessorTest {
         AuthnRequestType authnRequest = new AuthnRequestType("myId", null);
         authnRequest.setAssertionConsumerServiceURL(URI.create("http://localhost:8081/bla/broker/bundid/endpoint"));
 
-        AuthenticationSessionModel clientSession = Mockito.mock(AuthenticationSessionModel.class, Answers.RETURNS_DEEP_STUBS);
-        when(clientSession.getClientNote(Constants.REQUESTED_LEVEL_OF_AUTHENTICATION)).thenReturn("4");
+        AuthenticationSessionModel clientSession =
+                Mockito.mock(AuthenticationSessionModel.class, Answers.RETURNS_DEEP_STUBS);
+        when(clientSession.getClientNote(Constants.REQUESTED_LEVEL_OF_AUTHENTICATION))
+                .thenReturn("4");
 
         AuthnRequestType expectedResult = underTest.beforeSendingLoginRequest(authnRequest, clientSession);
 
-        assertEquals(AuthnContextComparisonType.MINIMUM, expectedResult.getRequestedAuthnContext().getComparison());
-        assertEquals(List.of(AuthnLevel.STORK4.getFullname()), expectedResult.getRequestedAuthnContext().getAuthnContextClassRef());
+        assertEquals(
+                AuthnContextComparisonType.MINIMUM,
+                expectedResult.getRequestedAuthnContext().getComparison());
+        assertEquals(
+                List.of(AuthnLevel.STORK4.getFullname()),
+                expectedResult.getRequestedAuthnContext().getAuthnContextClassRef());
     }
 
     @Test
@@ -55,8 +59,10 @@ class SamlAuthenticationPreprocessorTest {
         AuthnRequestType authnRequest = new AuthnRequestType("myId", null);
         authnRequest.setAssertionConsumerServiceURL(URI.create("http://localhost:8081/bla/broker/muk/endpoint"));
 
-        AuthenticationSessionModel clientSession = Mockito.mock(AuthenticationSessionModel.class, Answers.RETURNS_DEEP_STUBS);
-        when(clientSession.getClientNote(Constants.REQUESTED_LEVEL_OF_AUTHENTICATION)).thenReturn("4");
+        AuthenticationSessionModel clientSession =
+                Mockito.mock(AuthenticationSessionModel.class, Answers.RETURNS_DEEP_STUBS);
+        when(clientSession.getClientNote(Constants.REQUESTED_LEVEL_OF_AUTHENTICATION))
+                .thenReturn("4");
 
         AuthnRequestType expectedResult = underTest.beforeSendingLoginRequest(authnRequest, clientSession);
 

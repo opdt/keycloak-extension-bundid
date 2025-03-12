@@ -16,7 +16,11 @@
 
 package de.ba.oiam.keycloak.bundid;
 
+import static org.keycloak.protocol.oidc.mappers.OIDCAttributeMapperHelper.TOKEN_CLAIM_NAME;
+
 import com.google.auto.service.AutoService;
+import java.util.ArrayList;
+import java.util.List;
 import org.keycloak.models.*;
 import org.keycloak.protocol.ProtocolMapper;
 import org.keycloak.protocol.oidc.mappers.*;
@@ -24,13 +28,9 @@ import org.keycloak.provider.ProviderConfigProperty;
 import org.keycloak.representations.AccessTokenResponse;
 import org.keycloak.representations.IDToken;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import static org.keycloak.protocol.oidc.mappers.OIDCAttributeMapperHelper.TOKEN_CLAIM_NAME;
-
 @AutoService(ProtocolMapper.class)
-public class BundIdProtocolMapper extends AbstractOIDCProtocolMapper implements OIDCAccessTokenMapper, OIDCIDTokenMapper, OIDCAccessTokenResponseMapper, UserInfoTokenMapper {
+public class BundIdProtocolMapper extends AbstractOIDCProtocolMapper
+        implements OIDCAccessTokenMapper, OIDCIDTokenMapper, OIDCAccessTokenResponseMapper, UserInfoTokenMapper {
 
     private static final List<ProviderConfigProperty> configProperties = new ArrayList<>();
 
@@ -39,7 +39,6 @@ public class BundIdProtocolMapper extends AbstractOIDCProtocolMapper implements 
     }
 
     public static final String PROVIDER_ID = "oidc-bundid-sessionnote-mapper";
-
 
     public List<ProviderConfigProperty> getConfigProperties() {
         return configProperties;
@@ -69,18 +68,36 @@ public class BundIdProtocolMapper extends AbstractOIDCProtocolMapper implements 
         userSession.getNotes().entrySet().stream()
                 .filter(e -> e.getKey().startsWith(BundIdUserSessionAttributeMapper.BUNDID_SESSION_ATTRIBUTE_PREFIX))
                 .forEach(e -> {
-                    mappingModel.getConfig().put(TOKEN_CLAIM_NAME, e.getKey().replace(BundIdUserSessionAttributeMapper.BUNDID_SESSION_ATTRIBUTE_PREFIX, ""));
+                    mappingModel
+                            .getConfig()
+                            .put(
+                                    TOKEN_CLAIM_NAME,
+                                    e.getKey()
+                                            .replace(
+                                                    BundIdUserSessionAttributeMapper.BUNDID_SESSION_ATTRIBUTE_PREFIX,
+                                                    ""));
                     OIDCAttributeMapperHelper.mapClaim(token, mappingModel, e.getValue());
                 });
     }
 
     @Override
-    protected void setClaim(AccessTokenResponse accessTokenResponse, ProtocolMapperModel mappingModel, UserSessionModel userSession,
-                            KeycloakSession keycloakSession, ClientSessionContext clientSessionCtx) {
+    protected void setClaim(
+            AccessTokenResponse accessTokenResponse,
+            ProtocolMapperModel mappingModel,
+            UserSessionModel userSession,
+            KeycloakSession keycloakSession,
+            ClientSessionContext clientSessionCtx) {
         userSession.getNotes().entrySet().stream()
                 .filter(e -> e.getKey().startsWith(BundIdUserSessionAttributeMapper.BUNDID_SESSION_ATTRIBUTE_PREFIX))
                 .forEach(e -> {
-                    mappingModel.getConfig().put(TOKEN_CLAIM_NAME, e.getKey().replace(BundIdUserSessionAttributeMapper.BUNDID_SESSION_ATTRIBUTE_PREFIX, ""));
+                    mappingModel
+                            .getConfig()
+                            .put(
+                                    TOKEN_CLAIM_NAME,
+                                    e.getKey()
+                                            .replace(
+                                                    BundIdUserSessionAttributeMapper.BUNDID_SESSION_ATTRIBUTE_PREFIX,
+                                                    ""));
                     OIDCAttributeMapperHelper.mapClaim(accessTokenResponse, mappingModel, e.getValue());
                 });
     }

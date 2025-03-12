@@ -21,6 +21,8 @@ import de.ba.oiam.keycloak.bundid.extension.model.AuthenticationRequest;
 import de.ba.oiam.keycloak.bundid.extension.model.DisplayInformation;
 import de.ba.oiam.keycloak.bundid.extension.model.DisplayInformationValue;
 import de.ba.oiam.keycloak.bundid.extension.model.DisplayInformationVersion;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import org.jboss.logging.Logger;
 import org.keycloak.Config.Scope;
 import org.keycloak.authentication.authenticators.util.AcrStore;
@@ -33,9 +35,6 @@ import org.keycloak.models.KeycloakSessionFactory;
 import org.keycloak.protocol.saml.preprocessor.SamlAuthenticationPreprocessor;
 import org.keycloak.sessions.AuthenticationSessionModel;
 import org.keycloak.utils.StringUtil;
-
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 @AutoService(SamlAuthenticationPreprocessor.class)
 public class SamlAuthenticationPreprocessorImpl implements SamlAuthenticationPreprocessor {
@@ -56,12 +55,10 @@ public class SamlAuthenticationPreprocessorImpl implements SamlAuthenticationPre
 
     private Integer minimumStorkLevel = null;
 
-    public SamlAuthenticationPreprocessorImpl() {
-    }
+    public SamlAuthenticationPreprocessorImpl() {}
 
     @Override
-    public void close() {
-    }
+    public void close() {}
 
     // Create is never actually called since Keycloak is using a shortcut here...
     @Override
@@ -88,16 +85,22 @@ public class SamlAuthenticationPreprocessorImpl implements SamlAuthenticationPre
     }
 
     @Override
-    public AuthnRequestType beforeSendingLoginRequest(AuthnRequestType authnRequest, AuthenticationSessionModel authSession) {
-        Matcher idpNameMatcher = IDP_NAME_PATTERN.matcher(authnRequest.getAssertionConsumerServiceURL().getPath());
+    public AuthnRequestType beforeSendingLoginRequest(
+            AuthnRequestType authnRequest, AuthenticationSessionModel authSession) {
+        Matcher idpNameMatcher = IDP_NAME_PATTERN.matcher(
+                authnRequest.getAssertionConsumerServiceURL().getPath());
         if (!idpNameMatcher.matches()) {
-            LOG.warnf("Cannot find IDP name from consumer service URL '%s'. Preprocessor is skipped.", authnRequest.getAssertionConsumerServiceURL().toString());
+            LOG.warnf(
+                    "Cannot find IDP name from consumer service URL '%s'. Preprocessor is skipped.",
+                    authnRequest.getAssertionConsumerServiceURL().toString());
             return authnRequest;
         }
 
         String idpName = idpNameMatcher.group(1);
         if (!activeForIdp.equalsIgnoreCase(idpName)) {
-            LOG.infof("BundID preprocessor only runs for IDP with name '%s'. Got '%s'. Skipping...", activeForIdp, idpName);
+            LOG.infof(
+                    "BundID preprocessor only runs for IDP with name '%s'. Got '%s'. Skipping...",
+                    activeForIdp, idpName);
             return authnRequest;
         }
 
@@ -111,7 +114,8 @@ public class SamlAuthenticationPreprocessorImpl implements SamlAuthenticationPre
         }
 
         authSession.getRealm().getIdentityProviderMappersByAliasStream(idpName).forEach(model -> {
-            IdentityProviderMapper idpMapper = (IdentityProviderMapper) sessionFactory.getProviderFactory(IdentityProviderMapper.class, model.getIdentityProviderMapper());
+            IdentityProviderMapper idpMapper = (IdentityProviderMapper)
+                    sessionFactory.getProviderFactory(IdentityProviderMapper.class, model.getIdentityProviderMapper());
             if (idpMapper instanceof SamlAuthnRequestUpdater updater) {
                 updater.updateRequest(model, authnRequest);
             }
@@ -161,5 +165,4 @@ public class SamlAuthenticationPreprocessorImpl implements SamlAuthenticationPre
             authenticationRequest.addOrUpdate(authnRequest);
         }
     }
-
 }
