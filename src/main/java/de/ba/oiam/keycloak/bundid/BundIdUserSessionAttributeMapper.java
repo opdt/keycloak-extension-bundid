@@ -19,6 +19,10 @@ package de.ba.oiam.keycloak.bundid;
 import com.google.auto.service.AutoService;
 import de.ba.oiam.keycloak.bundid.extension.model.AuthenticationRequest;
 import de.ba.oiam.keycloak.bundid.extension.model.RequestedAttribute;
+import java.util.*;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
+import javax.xml.namespace.QName;
 import org.jboss.logging.Logger;
 import org.keycloak.broker.provider.AbstractIdentityProviderMapper;
 import org.keycloak.broker.provider.BrokeredIdentityContext;
@@ -35,13 +39,9 @@ import org.keycloak.saml.common.constants.JBossSAMLURIConstants;
 import org.keycloak.saml.common.util.StringUtil;
 import org.keycloak.sessions.AuthenticationSessionModel;
 
-import javax.xml.namespace.QName;
-import java.util.*;
-import java.util.function.Predicate;
-import java.util.stream.Collectors;
-
 @AutoService(IdentityProviderMapper.class)
-public class BundIdUserSessionAttributeMapper extends AbstractIdentityProviderMapper implements SamlAuthnRequestUpdater {
+public class BundIdUserSessionAttributeMapper extends AbstractIdentityProviderMapper
+        implements SamlAuthnRequestUpdater {
     private static final Logger LOG = Logger.getLogger(BundIdUserSessionAttributeMapper.class);
 
     public static final String[] COMPATIBLE_PROVIDERS = {SAMLIdentityProviderFactory.PROVIDER_ID};
@@ -56,10 +56,15 @@ public class BundIdUserSessionAttributeMapper extends AbstractIdentityProviderMa
     public static final String SESSION_ATTRIBUTE_PREFIX = "session.attribute.prefix";
     public static final String SESSION_ATTRIBUTE = "session.attribute";
     public static final String SESSION_ATTRIBUTE_EXCLUDE_FROM_AUTOMAPPER = "session.attribute.excludeFromAutomapper";
-    private static final Set<IdentityProviderSyncMode> IDENTITY_PROVIDER_SYNC_MODES = new HashSet<>(Arrays.asList(IdentityProviderSyncMode.values()));
+    private static final Set<IdentityProviderSyncMode> IDENTITY_PROVIDER_SYNC_MODES =
+            new HashSet<>(Arrays.asList(IdentityProviderSyncMode.values()));
 
-    public static final List<String> NAME_FORMATS = Arrays.asList(JBossSAMLURIConstants.ATTRIBUTE_FORMAT_BASIC.name(), JBossSAMLURIConstants.ATTRIBUTE_FORMAT_URI.name(), JBossSAMLURIConstants.ATTRIBUTE_FORMAT_UNSPECIFIED.name());
-    public static final QName TRUST_LEVEL_QNAME = new QName("https://www.akdb.de/request/2018/09", "TrustLevel", "akdb");
+    public static final List<String> NAME_FORMATS = Arrays.asList(
+            JBossSAMLURIConstants.ATTRIBUTE_FORMAT_BASIC.name(),
+            JBossSAMLURIConstants.ATTRIBUTE_FORMAT_URI.name(),
+            JBossSAMLURIConstants.ATTRIBUTE_FORMAT_UNSPECIFIED.name());
+    public static final QName TRUST_LEVEL_QNAME =
+            new QName("https://www.akdb.de/request/2018/09", "TrustLevel", "akdb");
 
     public static final String BUNDID_SESSION_ATTRIBUTE_PREFIX = "ba.bundid_prop_";
     public static final String BUNDID_SESSION_ATTRIBUTE_PREFIX_EXCLUDE_FROM_AUTOMAPPER = "ba.";
@@ -70,13 +75,15 @@ public class BundIdUserSessionAttributeMapper extends AbstractIdentityProviderMa
         property = new ProviderConfigProperty();
         property.setName(ATTRIBUTE_NAME);
         property.setLabel("Attribute Name");
-        property.setHelpText("Name of attribute to search for in assertion.  You can leave this blank and specify a friendly name instead.");
+        property.setHelpText(
+                "Name of attribute to search for in assertion.  You can leave this blank and specify a friendly name instead.");
         property.setType(ProviderConfigProperty.STRING_TYPE);
         configProperties.add(property);
         property = new ProviderConfigProperty();
         property.setName(ATTRIBUTE_FRIENDLY_NAME);
         property.setLabel("Friendly Name");
-        property.setHelpText("Friendly name of attribute to search for in assertion.  You can leave this blank and specify a name instead.");
+        property.setHelpText(
+                "Friendly name of attribute to search for in assertion.  You can leave this blank and specify a name instead.");
         property.setType(ProviderConfigProperty.STRING_TYPE);
         configProperties.add(property);
         property = new ProviderConfigProperty();
@@ -95,7 +102,8 @@ public class BundIdUserSessionAttributeMapper extends AbstractIdentityProviderMa
         property = new ProviderConfigProperty();
         property.setName(ATTRIBUTE_NAME_FORMAT);
         property.setLabel("Name Format");
-        property.setHelpText("Name format of attribute to specify in the RequestedAttribute element. Default to basic format.");
+        property.setHelpText(
+                "Name format of attribute to specify in the RequestedAttribute element. Default to basic format.");
         property.setType(ProviderConfigProperty.LIST_TYPE);
         property.setOptions(NAME_FORMATS);
         property.setDefaultValue(JBossSAMLURIConstants.ATTRIBUTE_FORMAT_BASIC.name());
@@ -154,28 +162,43 @@ public class BundIdUserSessionAttributeMapper extends AbstractIdentityProviderMa
     }
 
     @Override
-    public void preprocessFederatedIdentity(KeycloakSession session, RealmModel realm, IdentityProviderMapperModel mapperModel, BrokeredIdentityContext context) {
+    public void preprocessFederatedIdentity(
+            KeycloakSession session,
+            RealmModel realm,
+            IdentityProviderMapperModel mapperModel,
+            BrokeredIdentityContext context) {
         setSessionAttribute(session, mapperModel, context);
     }
 
     @Override
-    public void updateBrokeredUser(KeycloakSession session, RealmModel realm, UserModel user, IdentityProviderMapperModel mapperModel, BrokeredIdentityContext context) {
+    public void updateBrokeredUser(
+            KeycloakSession session,
+            RealmModel realm,
+            UserModel user,
+            IdentityProviderMapperModel mapperModel,
+            BrokeredIdentityContext context) {
         setSessionAttribute(session, mapperModel, context);
     }
 
     @Override
-    public void importNewUser(KeycloakSession session, RealmModel realm, UserModel user, IdentityProviderMapperModel mapperModel, BrokeredIdentityContext context) {
+    public void importNewUser(
+            KeycloakSession session,
+            RealmModel realm,
+            UserModel user,
+            IdentityProviderMapperModel mapperModel,
+            BrokeredIdentityContext context) {
         setSessionAttribute(session, mapperModel, context);
     }
 
-    private void setSessionAttribute(KeycloakSession session, IdentityProviderMapperModel mapperModel, BrokeredIdentityContext context) {
-        String attribute = mapperModel.getConfig()
-                .get(SESSION_ATTRIBUTE);
+    private void setSessionAttribute(
+            KeycloakSession session, IdentityProviderMapperModel mapperModel, BrokeredIdentityContext context) {
+        String attribute = mapperModel.getConfig().get(SESSION_ATTRIBUTE);
         if (StringUtil.isNullOrEmpty(attribute)) {
             return;
         }
 
-        boolean excludeFromAutomapper = Boolean.parseBoolean(mapperModel.getConfig().getOrDefault(SESSION_ATTRIBUTE_EXCLUDE_FROM_AUTOMAPPER, "false"));
+        boolean excludeFromAutomapper = Boolean.parseBoolean(
+                mapperModel.getConfig().getOrDefault(SESSION_ATTRIBUTE_EXCLUDE_FROM_AUTOMAPPER, "false"));
         String attributeName = getAttributeNameFromMapperModel(mapperModel);
 
         List<String> attributeValuesInContext = findAttributeValuesInContext(attributeName, context);
@@ -184,15 +207,32 @@ public class BundIdUserSessionAttributeMapper extends AbstractIdentityProviderMa
                 LOG.warnf("Attribute '%s' has more than one value. Discarding all but the first.", attributeName);
             }
 
-            String prefix = mapperModel.getConfig().getOrDefault(SESSION_ATTRIBUTE_PREFIX, excludeFromAutomapper ? BUNDID_SESSION_ATTRIBUTE_PREFIX_EXCLUDE_FROM_AUTOMAPPER : BUNDID_SESSION_ATTRIBUTE_PREFIX);
-            updateSession(session, context.getAuthenticationSession(), prefix + attribute, attributeValuesInContext.get(0), false);
+            String prefix = mapperModel
+                    .getConfig()
+                    .getOrDefault(
+                            SESSION_ATTRIBUTE_PREFIX,
+                            excludeFromAutomapper
+                                    ? BUNDID_SESSION_ATTRIBUTE_PREFIX_EXCLUDE_FROM_AUTOMAPPER
+                                    : BUNDID_SESSION_ATTRIBUTE_PREFIX);
+            updateSession(
+                    session,
+                    context.getAuthenticationSession(),
+                    prefix + attribute,
+                    attributeValuesInContext.get(0),
+                    false);
             findStorkValueForAttribute(attributeName, context)
-                    .ifPresent(stork -> updateSession(session, context.getAuthenticationSession(), prefix + attribute, stork, true));
+                    .ifPresent(stork -> updateSession(
+                            session, context.getAuthenticationSession(), prefix + attribute, stork, true));
         }
     }
 
     // Extension point for custom behavior
-    protected void updateSession(KeycloakSession session, AuthenticationSessionModel authSession, String key, String value, boolean isStorkLevel) {
+    protected void updateSession(
+            KeycloakSession session,
+            AuthenticationSessionModel authSession,
+            String key,
+            String value,
+            boolean isStorkLevel) {
         if (isStorkLevel) {
             authSession.setUserSessionNote(key + VERIFIED_LEVEL_SUFFIX, value);
         } else {
@@ -201,17 +241,16 @@ public class BundIdUserSessionAttributeMapper extends AbstractIdentityProviderMa
     }
 
     private String getAttributeNameFromMapperModel(IdentityProviderMapperModel mapperModel) {
-        String attributeName = mapperModel.getConfig()
-                .get(ATTRIBUTE_NAME);
+        String attributeName = mapperModel.getConfig().get(ATTRIBUTE_NAME);
         if (attributeName == null) {
-            attributeName = mapperModel.getConfig()
-                    .get(ATTRIBUTE_FRIENDLY_NAME);
+            attributeName = mapperModel.getConfig().get(ATTRIBUTE_FRIENDLY_NAME);
         }
         return attributeName;
     }
 
     private static Predicate<AttributeStatementType.ASTChoiceType> elementWithTrustLevel() {
-        return attributeType -> attributeType.getAttribute().getOtherAttributes().containsKey(TRUST_LEVEL_QNAME);
+        return attributeType ->
+                attributeType.getAttribute().getOtherAttributes().containsKey(TRUST_LEVEL_QNAME);
     }
 
     private static Predicate<AttributeStatementType.ASTChoiceType> elementWith(String attributeName) {
@@ -219,40 +258,32 @@ public class BundIdUserSessionAttributeMapper extends AbstractIdentityProviderMa
             AttributeType attribute = attributeType.getAttribute();
             String aName = attribute.getName();
             String aFriendlyName = attribute.getFriendlyName();
-            return ((aName != null && aName.equalsIgnoreCase(attributeName)) ||
-                    (aFriendlyName != null && aFriendlyName.equalsIgnoreCase(attributeName)));
+            return ((aName != null && aName.equalsIgnoreCase(attributeName))
+                    || (aFriendlyName != null && aFriendlyName.equalsIgnoreCase(attributeName)));
         };
     }
 
     private Optional<String> findStorkValueForAttribute(String attributeName, BrokeredIdentityContext context) {
-        AssertionType assertion = (AssertionType) context.getContextData()
-                .get(SAMLEndpoint.SAML_ASSERTION);
+        AssertionType assertion = (AssertionType) context.getContextData().get(SAMLEndpoint.SAML_ASSERTION);
 
-        return assertion.getAttributeStatements()
-                .stream()
-                .flatMap(statement -> statement.getAttributes()
-                        .stream())
+        return assertion.getAttributeStatements().stream()
+                .flatMap(statement -> statement.getAttributes().stream())
                 .filter(elementWith(attributeName))
                 .filter(elementWithTrustLevel())
-                .map(attributeType -> attributeType.getAttribute().getOtherAttributes().get(TRUST_LEVEL_QNAME))
+                .map(attributeType ->
+                        attributeType.getAttribute().getOtherAttributes().get(TRUST_LEVEL_QNAME))
                 .flatMap(trustLevel -> Optional.ofNullable(AuthnLevel.fromAkdbTrustlevel(trustLevel)).stream())
                 .map(AuthnLevel::getFullname)
                 .findFirst();
     }
 
-
     private List<String> findAttributeValuesInContext(String attributeName, BrokeredIdentityContext context) {
-        AssertionType assertion = (AssertionType) context.getContextData()
-                .get(SAMLEndpoint.SAML_ASSERTION);
+        AssertionType assertion = (AssertionType) context.getContextData().get(SAMLEndpoint.SAML_ASSERTION);
 
-        return assertion.getAttributeStatements()
-                .stream()
-                .flatMap(statement -> statement.getAttributes()
-                        .stream())
+        return assertion.getAttributeStatements().stream()
+                .flatMap(statement -> statement.getAttributes().stream())
                 .filter(elementWith(attributeName))
-                .flatMap(attributeType -> attributeType.getAttribute()
-                        .getAttributeValue()
-                        .stream())
+                .flatMap(attributeType -> attributeType.getAttribute().getAttributeValue().stream())
                 .filter(Objects::nonNull)
                 .map(Object::toString)
                 .collect(Collectors.toList());
@@ -283,7 +314,10 @@ public class BundIdUserSessionAttributeMapper extends AbstractIdentityProviderMa
             existingExtension.addOrUpdate(authnRequest);
         } else {
             AuthenticationRequest authenticationRequest = new AuthenticationRequest();
-            authenticationRequest.getRequestedAttributes().getRequestedAttributes().add(requestedAttribute);
+            authenticationRequest
+                    .getRequestedAttributes()
+                    .getRequestedAttributes()
+                    .add(requestedAttribute);
 
             authenticationRequest.addOrUpdate(authnRequest);
         }

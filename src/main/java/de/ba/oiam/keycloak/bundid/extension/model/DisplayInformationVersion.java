@@ -19,15 +19,14 @@ package de.ba.oiam.keycloak.bundid.extension.model;
 import jakarta.xml.bind.annotation.XmlAccessType;
 import jakarta.xml.bind.annotation.XmlAccessorType;
 import jakarta.xml.bind.annotation.XmlElement;
-import jakarta.xml.bind.annotation.XmlRootElement;
 
 @XmlAccessorType(XmlAccessType.FIELD)
 public class DisplayInformationVersion {
 
-    @XmlElement(name="OrganizationDisplayName", namespace = "https://www.akdb.de/request/2018/09/classic-ui/v1")
+    @XmlElement(name = "OrganizationDisplayName", namespace = "https://www.akdb.de/request/2018/09/classic-ui/v1")
     private DisplayInformationValue organizationDisplayName;
 
-    @XmlElement(name="OnlineServiceId", namespace = "https://www.akdb.de/request/2018/09/classic-ui/v1")
+    @XmlElement(name = "OnlineServiceId", namespace = "https://www.akdb.de/request/2018/09/classic-ui/v1")
     private DisplayInformationValue onlineServiceId;
 
     public void setOnlineServiceId(DisplayInformationValue onlineServiceId) {

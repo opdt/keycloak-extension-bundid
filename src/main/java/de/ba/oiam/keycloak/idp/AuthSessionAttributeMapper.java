@@ -17,6 +17,9 @@
 package de.ba.oiam.keycloak.idp;
 
 import com.google.auto.service.AutoService;
+import java.util.*;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
 import org.jboss.logging.Logger;
 import org.keycloak.broker.provider.AbstractIdentityProviderMapper;
 import org.keycloak.broker.provider.BrokeredIdentityContext;
@@ -30,11 +33,6 @@ import org.keycloak.models.*;
 import org.keycloak.provider.ProviderConfigProperty;
 import org.keycloak.saml.common.constants.JBossSAMLURIConstants;
 import org.keycloak.saml.common.util.StringUtil;
-
-import java.util.*;
-import java.util.function.Predicate;
-import java.util.stream.Collectors;
-
 
 /**
  * Based on {@link org.keycloak.broker.saml.mappers.UserAttributeMapper}
@@ -51,28 +49,35 @@ public class AuthSessionAttributeMapper extends AbstractIdentityProviderMapper {
     public static final String ATTRIBUTE_FRIENDLY_NAME = "attribute.friendly.name";
     public static final String ATTRIBUTE_NAME_FORMAT = "attribute.name.format";
     public static final String SESSION_ATTRIBUTE = "session.attribute";
-    private static final Set<IdentityProviderSyncMode> IDENTITY_PROVIDER_SYNC_MODES = new HashSet<>(Arrays.asList(IdentityProviderSyncMode.values()));
+    private static final Set<IdentityProviderSyncMode> IDENTITY_PROVIDER_SYNC_MODES =
+            new HashSet<>(Arrays.asList(IdentityProviderSyncMode.values()));
 
-    public static final List<String> NAME_FORMATS = Arrays.asList(JBossSAMLURIConstants.ATTRIBUTE_FORMAT_BASIC.name(), JBossSAMLURIConstants.ATTRIBUTE_FORMAT_URI.name(), JBossSAMLURIConstants.ATTRIBUTE_FORMAT_UNSPECIFIED.name());
+    public static final List<String> NAME_FORMATS = Arrays.asList(
+            JBossSAMLURIConstants.ATTRIBUTE_FORMAT_BASIC.name(),
+            JBossSAMLURIConstants.ATTRIBUTE_FORMAT_URI.name(),
+            JBossSAMLURIConstants.ATTRIBUTE_FORMAT_UNSPECIFIED.name());
 
     static {
         ProviderConfigProperty property;
         property = new ProviderConfigProperty();
         property.setName(ATTRIBUTE_NAME);
         property.setLabel("Attribute Name");
-        property.setHelpText("Name of attribute to search for in assertion.  You can leave this blank and specify a friendly name instead.");
+        property.setHelpText(
+                "Name of attribute to search for in assertion.  You can leave this blank and specify a friendly name instead.");
         property.setType(ProviderConfigProperty.STRING_TYPE);
         configProperties.add(property);
         property = new ProviderConfigProperty();
         property.setName(ATTRIBUTE_FRIENDLY_NAME);
         property.setLabel("Friendly Name");
-        property.setHelpText("Friendly name of attribute to search for in assertion.  You can leave this blank and specify a name instead.");
+        property.setHelpText(
+                "Friendly name of attribute to search for in assertion.  You can leave this blank and specify a name instead.");
         property.setType(ProviderConfigProperty.STRING_TYPE);
         configProperties.add(property);
         property = new ProviderConfigProperty();
         property.setName(ATTRIBUTE_NAME_FORMAT);
         property.setLabel("Name Format");
-        property.setHelpText("Name format of attribute to specify in the RequestedAttribute element. Default to basic format.");
+        property.setHelpText(
+                "Name format of attribute to specify in the RequestedAttribute element. Default to basic format.");
         property.setType(ProviderConfigProperty.LIST_TYPE);
         property.setOptions(NAME_FORMATS);
         property.setDefaultValue(JBossSAMLURIConstants.ATTRIBUTE_FORMAT_BASIC.name());
@@ -118,23 +123,36 @@ public class AuthSessionAttributeMapper extends AbstractIdentityProviderMapper {
     }
 
     @Override
-    public void preprocessFederatedIdentity(KeycloakSession session, RealmModel realm, IdentityProviderMapperModel mapperModel, BrokeredIdentityContext context) {
+    public void preprocessFederatedIdentity(
+            KeycloakSession session,
+            RealmModel realm,
+            IdentityProviderMapperModel mapperModel,
+            BrokeredIdentityContext context) {
         setAuthNote(mapperModel, context);
     }
 
     @Override
-    public void updateBrokeredUser(KeycloakSession session, RealmModel realm, UserModel user, IdentityProviderMapperModel mapperModel, BrokeredIdentityContext context) {
+    public void updateBrokeredUser(
+            KeycloakSession session,
+            RealmModel realm,
+            UserModel user,
+            IdentityProviderMapperModel mapperModel,
+            BrokeredIdentityContext context) {
         setAuthNote(mapperModel, context);
     }
 
     @Override
-    public void importNewUser(KeycloakSession session, RealmModel realm, UserModel user, IdentityProviderMapperModel mapperModel, BrokeredIdentityContext context) {
+    public void importNewUser(
+            KeycloakSession session,
+            RealmModel realm,
+            UserModel user,
+            IdentityProviderMapperModel mapperModel,
+            BrokeredIdentityContext context) {
         setAuthNote(mapperModel, context);
     }
 
     private void setAuthNote(IdentityProviderMapperModel mapperModel, BrokeredIdentityContext context) {
-        String attribute = mapperModel.getConfig()
-                .get(SESSION_ATTRIBUTE);
+        String attribute = mapperModel.getConfig().get(SESSION_ATTRIBUTE);
         if (StringUtil.isNullOrEmpty(attribute)) {
             return;
         }
@@ -145,17 +163,14 @@ public class AuthSessionAttributeMapper extends AbstractIdentityProviderMapper {
             if (attributeValuesInContext.size() > 1) {
                 LOG.warnf("Attribute '%s' has more than one value. Discarding all but the first.", attributeName);
             }
-            context.getAuthenticationSession()
-                    .setAuthNote(attribute, attributeValuesInContext.get(0));
+            context.getAuthenticationSession().setAuthNote(attribute, attributeValuesInContext.get(0));
         }
     }
 
     private String getAttributeNameFromMapperModel(IdentityProviderMapperModel mapperModel) {
-        String attributeName = mapperModel.getConfig()
-                .get(ATTRIBUTE_NAME);
+        String attributeName = mapperModel.getConfig().get(ATTRIBUTE_NAME);
         if (attributeName == null) {
-            attributeName = mapperModel.getConfig()
-                    .get(ATTRIBUTE_FRIENDLY_NAME);
+            attributeName = mapperModel.getConfig().get(ATTRIBUTE_FRIENDLY_NAME);
         }
         return attributeName;
     }
@@ -168,19 +183,13 @@ public class AuthSessionAttributeMapper extends AbstractIdentityProviderMapper {
         };
     }
 
-
     private List<String> findAttributeValuesInContext(String attributeName, BrokeredIdentityContext context) {
-        AssertionType assertion = (AssertionType) context.getContextData()
-                .get(SAMLEndpoint.SAML_ASSERTION);
+        AssertionType assertion = (AssertionType) context.getContextData().get(SAMLEndpoint.SAML_ASSERTION);
 
-        return assertion.getAttributeStatements()
-                .stream()
-                .flatMap(statement -> statement.getAttributes()
-                        .stream())
+        return assertion.getAttributeStatements().stream()
+                .flatMap(statement -> statement.getAttributes().stream())
                 .filter(elementWith(attributeName))
-                .flatMap(attributeType -> attributeType.getAttribute()
-                        .getAttributeValue()
-                        .stream())
+                .flatMap(attributeType -> attributeType.getAttribute().getAttributeValue().stream())
                 .filter(Objects::nonNull)
                 .map(Object::toString)
                 .collect(Collectors.toList());

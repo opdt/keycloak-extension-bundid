@@ -19,12 +19,11 @@ package de.ba.oiam.keycloak.bundid.extension.model;
 import jakarta.xml.bind.annotation.XmlAccessType;
 import jakarta.xml.bind.annotation.XmlAccessorType;
 import jakarta.xml.bind.annotation.XmlElement;
-import jakarta.xml.bind.annotation.XmlRootElement;
 
 @XmlAccessorType(XmlAccessType.FIELD)
 public class DisplayInformation {
 
-    @XmlElement(name="Version", namespace = "https://www.akdb.de/request/2018/09/classic-ui/v1")
+    @XmlElement(name = "Version", namespace = "https://www.akdb.de/request/2018/09/classic-ui/v1")
     private DisplayInformationVersion version;
 
     public void setVersion(DisplayInformationVersion version) {

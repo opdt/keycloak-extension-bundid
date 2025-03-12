@@ -16,6 +16,11 @@
 
 package de.ba.oiam.keycloak.bundid;
 
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
 import org.junit.jupiter.api.Test;
 import org.keycloak.broker.provider.BrokeredIdentityContext;
 import org.keycloak.models.ClientModel;
@@ -24,12 +29,6 @@ import org.keycloak.models.RealmModel;
 import org.keycloak.models.UserModel;
 import org.keycloak.sessions.AuthenticationSessionModel;
 import org.keycloak.sessions.RootAuthenticationSessionModel;
-
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
-
-import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 public class RetrievalTimestampAttributeMapperTest {
     @Test
@@ -77,14 +76,10 @@ public class RetrievalTimestampAttributeMapperTest {
         }
 
         @Override
-        public void setExecutionStatus(String authenticator, ExecutionStatus status) {
-
-        }
+        public void setExecutionStatus(String authenticator, ExecutionStatus status) {}
 
         @Override
-        public void clearExecutionStatus() {
-
-        }
+        public void clearExecutionStatus() {}
 
         @Override
         public UserModel getAuthenticatedUser() {
@@ -92,9 +87,7 @@ public class RetrievalTimestampAttributeMapperTest {
         }
 
         @Override
-        public void setAuthenticatedUser(UserModel user) {
-
-        }
+        public void setAuthenticatedUser(UserModel user) {}
 
         @Override
         public Set<String> getRequiredActions() {
@@ -102,29 +95,19 @@ public class RetrievalTimestampAttributeMapperTest {
         }
 
         @Override
-        public void addRequiredAction(String action) {
-
-        }
+        public void addRequiredAction(String action) {}
 
         @Override
-        public void removeRequiredAction(String action) {
-
-        }
+        public void removeRequiredAction(String action) {}
 
         @Override
-        public void addRequiredAction(UserModel.RequiredAction action) {
-
-        }
+        public void addRequiredAction(UserModel.RequiredAction action) {}
 
         @Override
-        public void removeRequiredAction(UserModel.RequiredAction action) {
-
-        }
+        public void removeRequiredAction(UserModel.RequiredAction action) {}
 
         @Override
-        public void clearUserSessionNotes() {
-
-        }
+        public void clearUserSessionNotes() {}
 
         @Override
         public String getAuthNote(String name) {
@@ -132,19 +115,13 @@ public class RetrievalTimestampAttributeMapperTest {
         }
 
         @Override
-        public void setAuthNote(String name, String value) {
-
-        }
+        public void setAuthNote(String name, String value) {}
 
         @Override
-        public void removeAuthNote(String name) {
-
-        }
+        public void removeAuthNote(String name) {}
 
         @Override
-        public void clearAuthNotes() {
-
-        }
+        public void clearAuthNotes() {}
 
         @Override
         public String getClientNote(String name) {
@@ -152,14 +129,10 @@ public class RetrievalTimestampAttributeMapperTest {
         }
 
         @Override
-        public void setClientNote(String name, String value) {
-
-        }
+        public void setClientNote(String name, String value) {}
 
         @Override
-        public void removeClientNote(String name) {
-
-        }
+        public void removeClientNote(String name) {}
 
         @Override
         public Map<String, String> getClientNotes() {
@@ -167,9 +140,7 @@ public class RetrievalTimestampAttributeMapperTest {
         }
 
         @Override
-        public void clearClientNotes() {
-
-        }
+        public void clearClientNotes() {}
 
         @Override
         public Set<String> getClientScopes() {
@@ -177,9 +148,7 @@ public class RetrievalTimestampAttributeMapperTest {
         }
 
         @Override
-        public void setClientScopes(Set<String> clientScopes) {
-
-        }
+        public void setClientScopes(Set<String> clientScopes) {}
 
         @Override
         public String getRedirectUri() {
@@ -187,9 +156,7 @@ public class RetrievalTimestampAttributeMapperTest {
         }
 
         @Override
-        public void setRedirectUri(String uri) {
-
-        }
+        public void setRedirectUri(String uri) {}
 
         @Override
         public RealmModel getRealm() {
@@ -207,9 +174,7 @@ public class RetrievalTimestampAttributeMapperTest {
         }
 
         @Override
-        public void setAction(String action) {
-
-        }
+        public void setAction(String action) {}
 
         @Override
         public String getProtocol() {
@@ -217,8 +182,6 @@ public class RetrievalTimestampAttributeMapperTest {
         }
 
         @Override
-        public void setProtocol(String method) {
-
-        }
+        public void setProtocol(String method) {}
     }
 }

@@ -16,10 +16,9 @@
 
 @XmlSchema(
         xmlns = {
-                @XmlNs(prefix = "akdb", namespaceURI = "https://www.akdb.de/request/2018/09"),
-                @XmlNs(prefix = "classic-ui", namespaceURI = "https://www.akdb.de/request/2018/09/classic-ui/v1")
-        }
-)
+            @XmlNs(prefix = "akdb", namespaceURI = "https://www.akdb.de/request/2018/09"),
+            @XmlNs(prefix = "classic-ui", namespaceURI = "https://www.akdb.de/request/2018/09/classic-ui/v1")
+        })
 package de.ba.oiam.keycloak.bundid.extension.model;
 
 import jakarta.xml.bind.annotation.XmlNs;

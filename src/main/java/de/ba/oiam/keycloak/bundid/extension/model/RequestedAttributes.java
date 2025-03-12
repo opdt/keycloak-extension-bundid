@@ -16,10 +16,10 @@
 
 package de.ba.oiam.keycloak.bundid.extension.model;
 
+import jakarta.xml.bind.annotation.*;
 import java.util.ArrayList;
 import java.util.List;
 
-import jakarta.xml.bind.annotation.*;
 @XmlAccessorType(XmlAccessType.FIELD)
 public class RequestedAttributes {
 
