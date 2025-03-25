@@ -98,7 +98,7 @@ public class SamlAuthenticationPreprocessorImpl implements SamlAuthenticationPre
 
         String idpName = idpNameMatcher.group(1);
         if (!activeForIdp.equalsIgnoreCase(idpName)) {
-            LOG.infof(
+            LOG.tracef(
                     "BundID preprocessor only runs for IDP with name '%s'. Got '%s'. Skipping...",
                     activeForIdp, idpName);
             return authnRequest;
