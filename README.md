@@ -23,6 +23,7 @@ Der Default-Wert ist `bundid`. D.h. wenn dieser Name für den BundID-Identity Pr
 Die Extension definiert mehrere IdentityProviderMapper:
 
 - `saml-bundid-session-attribute-idp-mapper` (für das Mapping von BundID-Attributen in die Keycloak-Session)
+- `saml-bundid-session-email-idp-mapper` (setzt zusätzlich die E-Mail im BrokeredIdentityContext und macht sie damit für die weitere Verarbeitung in Keycloak bekannt)
 - `saml-retrieval-time-session-attribute-idp-mapper` (für das Mapping des Zeitstempels der BundID-Authentifizierung in die Keycloak-Session)
 
 Außerdem wird ein ProtocolMapper definiert:

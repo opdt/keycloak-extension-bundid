@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package de.ba.oiam.keycloak.bundid;
+package de.ba.oiam.keycloak.bundid.mapper;
 
 import com.google.auto.service.AutoService;
 import java.util.*;

@@ -21,6 +21,9 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
+
+import de.ba.oiam.keycloak.bundid.mapper.BundIdUserSessionAttributeMapper;
+import de.ba.oiam.keycloak.bundid.mapper.RetrievalTimestampAttributeMapper;
 import org.junit.jupiter.api.Test;
 import org.keycloak.broker.provider.BrokeredIdentityContext;
 import org.keycloak.models.ClientModel;

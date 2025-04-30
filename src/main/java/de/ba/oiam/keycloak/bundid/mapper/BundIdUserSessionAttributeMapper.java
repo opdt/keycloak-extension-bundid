@@ -14,9 +14,11 @@
  * limitations under the License.
  */
 
-package de.ba.oiam.keycloak.bundid;
+package de.ba.oiam.keycloak.bundid.mapper;
 
 import com.google.auto.service.AutoService;
+import de.ba.oiam.keycloak.bundid.AuthnLevel;
+import de.ba.oiam.keycloak.bundid.SamlAuthnRequestUpdater;
 import de.ba.oiam.keycloak.bundid.extension.model.AuthenticationRequest;
 import de.ba.oiam.keycloak.bundid.extension.model.RequestedAttribute;
 import java.util.*;
@@ -216,7 +218,7 @@ public class BundIdUserSessionAttributeMapper extends AbstractIdentityProviderMa
                                     : BUNDID_SESSION_ATTRIBUTE_PREFIX);
             updateSession(
                     session,
-                    context.getAuthenticationSession(),
+                    context,
                     prefix + attribute,
                     attributeValuesInContext.get(0),
                     false);
@@ -227,6 +229,16 @@ public class BundIdUserSessionAttributeMapper extends AbstractIdentityProviderMa
     }
 
     // Extension point for custom behavior
+    protected void updateSession(
+            KeycloakSession session,
+            BrokeredIdentityContext context,
+            String key,
+            String value,
+            boolean isStorkLevel) {
+        updateSession(session, context.getAuthenticationSession(), key, value, isStorkLevel);
+    }
+
+    @Deprecated
     protected void updateSession(
             KeycloakSession session,
             AuthenticationSessionModel authSession,

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package de.ba.oiam.keycloak.bundid;
+package de.ba.oiam.keycloak.bundid.mapper;
 
 import static org.keycloak.protocol.oidc.mappers.OIDCAttributeMapperHelper.TOKEN_CLAIM_NAME;
 
