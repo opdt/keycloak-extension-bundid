@@ -19,6 +19,7 @@ package de.ba.oiam.keycloak.bundid;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import de.ba.oiam.keycloak.bundid.extension.model.AuthenticationRequest;
+import de.ba.oiam.keycloak.bundid.mapper.BundIdUserSessionAttributeMapper;
 import jakarta.xml.bind.JAXBContext;
 import jakarta.xml.bind.JAXBException;
 import jakarta.xml.bind.Unmarshaller;
